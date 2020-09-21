@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
   creationTimestamp: null
-  name: buckets.s3.services.k8s.aws
+  name: processingjobs.sagemaker.services.k8s.aws
 spec:
-  group: s3.services.k8s.aws
+  group: sagemaker.services.k8s.aws
   names:
-    kind: Bucket
-    listKind: BucketList
-    plural: buckets
-    singular: bucket
+    kind: ProcessingJob
+    listKind: ProcessingJobList
+    plural: processingjobs
+    singular: processingjob
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Bucket is the Schema for the Buckets API
+        description: ProcessingJob is the Schema for the ProcessingJobs API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,32 +34,133 @@ spec:
           metadata:
             type: object
           spec:
-            description: BucketSpec defines the desired state of Bucket
+            description: ProcessingJobSpec defines the desired state of ProcessingJob
             properties:
-              acl:
-                type: string
-              createBucketConfiguration:
+              appSpecification:
                 properties:
-                  locationConstraint:
+                  containerArguments:
+                    items:
+                      type: string
+                    type: array
+                  containerEntrypoint:
+                    items:
+                      type: string
+                    type: array
+                  imageURI:
                     type: string
                 type: object
-              grantFullControl:
+              environment:
+                additionalProperties:
+                  type: string
+                type: object
+              experimentConfig:
+                properties:
+                  experimentName:
+                    type: string
+                  trialComponentDisplayName:
+                    type: string
+                  trialName:
+                    type: string
+                type: object
+              networkConfig:
+                properties:
+                  enableInterContainerTrafficEncryption:
+                    type: boolean
+                  enableNetworkIsolation:
+                    type: boolean
+                  vpcConfig:
+                    properties:
+                      securityGroupIDs:
+                        items:
+                          type: string
+                        type: array
+                      subnets:
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                type: object
+              processingInputs:
+                items:
+                  properties:
+                    inputName:
+                      type: string
+                    s3Input:
+                      properties:
+                        localPath:
+                          type: string
+                        s3CompressionType:
+                          type: string
+                        s3DataDistributionType:
+                          type: string
+                        s3DataType:
+                          type: string
+                        s3InputMode:
+                          type: string
+                        s3URI:
+                          type: string
+                      type: object
+                  type: object
+                type: array
+              processingJobName:
                 type: string
-              grantRead:
+              processingOutputConfig:
+                properties:
+                  kmsKeyID:
+                    type: string
+                  outputs:
+                    items:
+                      properties:
+                        outputName:
+                          type: string
+                        s3Output:
+                          properties:
+                            localPath:
+                              type: string
+                            s3URI:
+                              type: string
+                            s3UploadMode:
+                              type: string
+                          type: object
+                      type: object
+                    type: array
+                type: object
+              processingResources:
+                properties:
+                  clusterConfig:
+                    properties:
+                      instanceCount:
+                        format: int64
+                        type: integer
+                      instanceType:
+                        type: string
+                      volumeKMSKeyID:
+                        type: string
+                      volumeSizeInGB:
+                        format: int64
+                        type: integer
+                    type: object
+                type: object
+              roleARN:
                 type: string
-              grantReadACP:
-                type: string
-              grantWrite:
-                type: string
-              grantWriteACP:
-                type: string
-              name:
-                type: string
-              objectLockEnabledForBucket:
-                type: boolean
+              stoppingCondition:
+                properties:
+                  maxRuntimeInSeconds:
+                    format: int64
+                    type: integer
+                type: object
+              tags:
+                items:
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
             type: object
           status:
-            description: BucketStatus defines the observed state of Bucket
+            description: ProcessingJobStatus defines the observed state of ProcessingJob
             properties:
               ackResourceMetadata:
                 description: All CRs managed by ACK have a common `Status.ACKResourceMetadata`
@@ -117,8 +218,6 @@ spec:
                   - type
                   type: object
                 type: array
-              location:
-                type: string
             required:
             - ackResourceMetadata
             - conditions

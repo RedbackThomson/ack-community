@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
   creationTimestamp: null
-  name: buckets.s3.services.k8s.aws
+  name: endpointconfigs.sagemaker.services.k8s.aws
 spec:
-  group: s3.services.k8s.aws
+  group: sagemaker.services.k8s.aws
   names:
-    kind: Bucket
-    listKind: BucketList
-    plural: buckets
-    singular: bucket
+    kind: EndpointConfig
+    listKind: EndpointConfigList
+    plural: endpointconfigs
+    singular: endpointconfig
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Bucket is the Schema for the Buckets API
+        description: EndpointConfig is the Schema for the EndpointConfigs API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,32 +34,72 @@ spec:
           metadata:
             type: object
           spec:
-            description: BucketSpec defines the desired state of Bucket
+            description: EndpointConfigSpec defines the desired state of EndpointConfig
             properties:
-              acl:
-                type: string
-              createBucketConfiguration:
+              dataCaptureConfig:
                 properties:
-                  locationConstraint:
+                  captureContentTypeHeader:
+                    properties:
+                      csvContentTypes:
+                        items:
+                          type: string
+                        type: array
+                      jsonContentTypes:
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  captureOptions:
+                    items:
+                      properties:
+                        captureMode:
+                          type: string
+                      type: object
+                    type: array
+                  destinationS3URI:
+                    type: string
+                  enableCapture:
+                    type: boolean
+                  initialSamplingPercentage:
+                    format: int64
+                    type: integer
+                  kmsKeyID:
                     type: string
                 type: object
-              grantFullControl:
+              endpointConfigName:
                 type: string
-              grantRead:
+              kmsKeyID:
                 type: string
-              grantReadACP:
-                type: string
-              grantWrite:
-                type: string
-              grantWriteACP:
-                type: string
-              name:
-                type: string
-              objectLockEnabledForBucket:
-                type: boolean
+              productionVariants:
+                items:
+                  properties:
+                    acceleratorType:
+                      type: string
+                    initialInstanceCount:
+                      format: int64
+                      type: integer
+                    initialVariantWeight:
+                      type: number
+                    instanceType:
+                      type: string
+                    modelName:
+                      type: string
+                    variantName:
+                      type: string
+                  type: object
+                type: array
+              tags:
+                items:
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
             type: object
           status:
-            description: BucketStatus defines the observed state of Bucket
+            description: EndpointConfigStatus defines the observed state of EndpointConfig
             properties:
               ackResourceMetadata:
                 description: All CRs managed by ACK have a common `Status.ACKResourceMetadata`
@@ -117,8 +157,6 @@ spec:
                   - type
                   type: object
                 type: array
-              location:
-                type: string
             required:
             - ackResourceMetadata
             - conditions

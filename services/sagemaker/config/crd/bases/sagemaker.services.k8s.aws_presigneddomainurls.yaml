@@ -6,20 +6,21 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
   creationTimestamp: null
-  name: buckets.s3.services.k8s.aws
+  name: presigneddomainurls.sagemaker.services.k8s.aws
 spec:
-  group: s3.services.k8s.aws
+  group: sagemaker.services.k8s.aws
   names:
-    kind: Bucket
-    listKind: BucketList
-    plural: buckets
-    singular: bucket
+    kind: PresignedDomainURL
+    listKind: PresignedDomainURLList
+    plural: presigneddomainurls
+    singular: presigneddomainurl
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Bucket is the Schema for the Buckets API
+        description: PresignedDomainURL is the Schema for the PresignedDomainURLS
+          API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,32 +35,18 @@ spec:
           metadata:
             type: object
           spec:
-            description: BucketSpec defines the desired state of Bucket
+            description: PresignedDomainURLSpec defines the desired state of PresignedDomainURL
             properties:
-              acl:
+              domainID:
                 type: string
-              createBucketConfiguration:
-                properties:
-                  locationConstraint:
-                    type: string
-                type: object
-              grantFullControl:
+              sessionExpirationDurationInSeconds:
+                format: int64
+                type: integer
+              userProfileName:
                 type: string
-              grantRead:
-                type: string
-              grantReadACP:
-                type: string
-              grantWrite:
-                type: string
-              grantWriteACP:
-                type: string
-              name:
-                type: string
-              objectLockEnabledForBucket:
-                type: boolean
             type: object
           status:
-            description: BucketStatus defines the observed state of Bucket
+            description: PresignedDomainURLStatus defines the observed state of PresignedDomainURL
             properties:
               ackResourceMetadata:
                 description: All CRs managed by ACK have a common `Status.ACKResourceMetadata`
@@ -84,6 +71,8 @@ spec:
                 required:
                 - ownerAccountID
                 type: object
+              authorizedURL:
+                type: string
               conditions:
                 description: All CRS managed by ACK have a common `Status.Conditions`
                   member that contains a collection of `ackv1alpha1.Condition` objects
@@ -117,8 +106,6 @@ spec:
                   - type
                   type: object
                 type: array
-              location:
-                type: string
             required:
             - ackResourceMetadata
             - conditions

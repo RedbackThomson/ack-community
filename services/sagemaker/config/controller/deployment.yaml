@@ -8,7 +8,7 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ack-s3-controller
+  name: ack-sagemaker-controller
   namespace: ack-system
   labels:
     control-plane: controller

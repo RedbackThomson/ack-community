@@ -1,0 +1,508 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: ack-controller
+rules:
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - algorithms
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - algorithms/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - automljobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - automljobs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - coderepositories
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - coderepositories/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - compilationjobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - compilationjobs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - endpointconfigs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - endpointconfigs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - endpoints
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - endpoints/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - experiments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - experiments/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - humantaskuis
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - humantaskuis/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - hyperparametertuningjobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - hyperparametertuningjobs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - labelingjobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - labelingjobs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - modelpackages
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - modelpackages/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - models
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - models/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - monitoringschedules
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - monitoringschedules/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - notebookinstancelifecycleconfigs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - notebookinstancelifecycleconfigs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - notebookinstances
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - notebookinstances/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - presigneddomainurls
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - presigneddomainurls/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - presignednotebookinstanceurls
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - presignednotebookinstanceurls/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - processingjobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - processingjobs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - trainingjobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - trainingjobs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - transformjobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - transformjobs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - trialcomponents
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - trialcomponents/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - trials
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - trials/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - userprofiles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - userprofiles/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - workforces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - workforces/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - workteams
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sagemaker.services.k8s.aws
+  resources:
+  - workteams/status
+  verbs:
+  - get
+  - patch
+  - update

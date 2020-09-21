@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
   creationTimestamp: null
-  name: buckets.s3.services.k8s.aws
+  name: coderepositories.sagemaker.services.k8s.aws
 spec:
-  group: s3.services.k8s.aws
+  group: sagemaker.services.k8s.aws
   names:
-    kind: Bucket
-    listKind: BucketList
-    plural: buckets
-    singular: bucket
+    kind: CodeRepository
+    listKind: CodeRepositoryList
+    plural: coderepositories
+    singular: coderepository
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Bucket is the Schema for the Buckets API
+        description: CodeRepository is the Schema for the CodeRepositories API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,32 +34,22 @@ spec:
           metadata:
             type: object
           spec:
-            description: BucketSpec defines the desired state of Bucket
+            description: CodeRepositorySpec defines the desired state of CodeRepository
             properties:
-              acl:
+              codeRepositoryName:
                 type: string
-              createBucketConfiguration:
+              gitConfig:
                 properties:
-                  locationConstraint:
+                  branch:
+                    type: string
+                  repositoryURL:
+                    type: string
+                  secretARN:
                     type: string
                 type: object
-              grantFullControl:
-                type: string
-              grantRead:
-                type: string
-              grantReadACP:
-                type: string
-              grantWrite:
-                type: string
-              grantWriteACP:
-                type: string
-              name:
-                type: string
-              objectLockEnabledForBucket:
-                type: boolean
             type: object
           status:
-            description: BucketStatus defines the observed state of Bucket
+            description: CodeRepositoryStatus defines the observed state of CodeRepository
             properties:
               ackResourceMetadata:
                 description: All CRs managed by ACK have a common `Status.ACKResourceMetadata`
@@ -117,8 +107,6 @@ spec:
                   - type
                   type: object
                 type: array
-              location:
-                type: string
             required:
             - ackResourceMetadata
             - conditions

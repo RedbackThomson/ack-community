@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
   creationTimestamp: null
-  name: buckets.s3.services.k8s.aws
+  name: labelingjobs.sagemaker.services.k8s.aws
 spec:
-  group: s3.services.k8s.aws
+  group: sagemaker.services.k8s.aws
   names:
-    kind: Bucket
-    listKind: BucketList
-    plural: buckets
-    singular: bucket
+    kind: LabelingJob
+    listKind: LabelingJobList
+    plural: labelingjobs
+    singular: labelingjob
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Bucket is the Schema for the Buckets API
+        description: LabelingJob is the Schema for the LabelingJobs API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,32 +34,135 @@ spec:
           metadata:
             type: object
           spec:
-            description: BucketSpec defines the desired state of Bucket
+            description: LabelingJobSpec defines the desired state of LabelingJob
             properties:
-              acl:
-                type: string
-              createBucketConfiguration:
+              humanTaskConfig:
                 properties:
-                  locationConstraint:
+                  annotationConsolidationConfig:
+                    properties:
+                      annotationConsolidationLambdaARN:
+                        type: string
+                    type: object
+                  maxConcurrentTaskCount:
+                    format: int64
+                    type: integer
+                  numberOfHumanWorkersPerDataObject:
+                    format: int64
+                    type: integer
+                  preHumanTaskLambdaARN:
+                    type: string
+                  publicWorkforceTaskPrice:
+                    properties:
+                      amountInUsd:
+                        properties:
+                          cents:
+                            format: int64
+                            type: integer
+                          dollars:
+                            format: int64
+                            type: integer
+                          tenthFractionsOfACent:
+                            format: int64
+                            type: integer
+                        type: object
+                    type: object
+                  taskAvailabilityLifetimeInSeconds:
+                    format: int64
+                    type: integer
+                  taskDescription:
+                    type: string
+                  taskKeywords:
+                    items:
+                      type: string
+                    type: array
+                  taskTimeLimitInSeconds:
+                    format: int64
+                    type: integer
+                  taskTitle:
+                    type: string
+                  uiConfig:
+                    properties:
+                      humanTaskUiARN:
+                        type: string
+                      uiTemplateS3URI:
+                        type: string
+                    type: object
+                  workteamARN:
                     type: string
                 type: object
-              grantFullControl:
+              inputConfig:
+                properties:
+                  dataAttributes:
+                    properties:
+                      contentClassifiers:
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  dataSource:
+                    properties:
+                      s3DataSource:
+                        properties:
+                          manifestS3URI:
+                            type: string
+                        type: object
+                      snsDataSource:
+                        properties:
+                          snsTopicARN:
+                            type: string
+                        type: object
+                    type: object
+                type: object
+              labelAttributeName:
                 type: string
-              grantRead:
+              labelCategoryConfigS3URI:
                 type: string
-              grantReadACP:
+              labelingJobAlgorithmsConfig:
+                properties:
+                  initialActiveLearningModelARN:
+                    type: string
+                  labelingJobAlgorithmSpecificationARN:
+                    type: string
+                  labelingJobResourceConfig:
+                    properties:
+                      volumeKMSKeyID:
+                        type: string
+                    type: object
+                type: object
+              labelingJobName:
                 type: string
-              grantWrite:
+              outputConfig:
+                properties:
+                  kmsKeyID:
+                    type: string
+                  s3OutputPath:
+                    type: string
+                  snsTopicARN:
+                    type: string
+                type: object
+              roleARN:
                 type: string
-              grantWriteACP:
-                type: string
-              name:
-                type: string
-              objectLockEnabledForBucket:
-                type: boolean
+              stoppingConditions:
+                properties:
+                  maxHumanLabeledObjectCount:
+                    format: int64
+                    type: integer
+                  maxPercentageOfInputDatasetLabeled:
+                    format: int64
+                    type: integer
+                type: object
+              tags:
+                items:
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
             type: object
           status:
-            description: BucketStatus defines the observed state of Bucket
+            description: LabelingJobStatus defines the observed state of LabelingJob
             properties:
               ackResourceMetadata:
                 description: All CRs managed by ACK have a common `Status.ACKResourceMetadata`
@@ -117,8 +220,6 @@ spec:
                   - type
                   type: object
                 type: array
-              location:
-                type: string
             required:
             - ackResourceMetadata
             - conditions

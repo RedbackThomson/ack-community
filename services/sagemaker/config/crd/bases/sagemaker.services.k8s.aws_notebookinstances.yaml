@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
   creationTimestamp: null
-  name: buckets.s3.services.k8s.aws
+  name: notebookinstances.sagemaker.services.k8s.aws
 spec:
-  group: s3.services.k8s.aws
+  group: sagemaker.services.k8s.aws
   names:
-    kind: Bucket
-    listKind: BucketList
-    plural: buckets
-    singular: bucket
+    kind: NotebookInstance
+    listKind: NotebookInstanceList
+    plural: notebookinstances
+    singular: notebookinstance
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Bucket is the Schema for the Buckets API
+        description: NotebookInstance is the Schema for the NotebookInstances API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,32 +34,53 @@ spec:
           metadata:
             type: object
           spec:
-            description: BucketSpec defines the desired state of Bucket
+            description: NotebookInstanceSpec defines the desired state of NotebookInstance
             properties:
-              acl:
+              acceleratorTypes:
+                items:
+                  type: string
+                type: array
+              additionalCodeRepositories:
+                items:
+                  type: string
+                type: array
+              defaultCodeRepository:
                 type: string
-              createBucketConfiguration:
-                properties:
-                  locationConstraint:
-                    type: string
-                type: object
-              grantFullControl:
+              directInternetAccess:
                 type: string
-              grantRead:
+              instanceType:
                 type: string
-              grantReadACP:
+              kmsKeyID:
                 type: string
-              grantWrite:
+              lifecycleConfigName:
                 type: string
-              grantWriteACP:
+              notebookInstanceName:
                 type: string
-              name:
+              roleARN:
                 type: string
-              objectLockEnabledForBucket:
-                type: boolean
+              rootAccess:
+                type: string
+              securityGroupIDs:
+                items:
+                  type: string
+                type: array
+              subnetID:
+                type: string
+              tags:
+                items:
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
+              volumeSizeInGB:
+                format: int64
+                type: integer
             type: object
           status:
-            description: BucketStatus defines the observed state of Bucket
+            description: NotebookInstanceStatus defines the observed state of NotebookInstance
             properties:
               ackResourceMetadata:
                 description: All CRs managed by ACK have a common `Status.ACKResourceMetadata`
@@ -117,8 +138,6 @@ spec:
                   - type
                   type: object
                 type: array
-              location:
-                type: string
             required:
             - ackResourceMetadata
             - conditions

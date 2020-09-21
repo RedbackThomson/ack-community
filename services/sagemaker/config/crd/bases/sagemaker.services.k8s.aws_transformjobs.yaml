@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
   creationTimestamp: null
-  name: buckets.s3.services.k8s.aws
+  name: transformjobs.sagemaker.services.k8s.aws
 spec:
-  group: s3.services.k8s.aws
+  group: sagemaker.services.k8s.aws
   names:
-    kind: Bucket
-    listKind: BucketList
-    plural: buckets
-    singular: bucket
+    kind: TransformJob
+    listKind: TransformJobList
+    plural: transformjobs
+    singular: transformjob
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Bucket is the Schema for the Buckets API
+        description: TransformJob is the Schema for the TransformJobs API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,32 +34,103 @@ spec:
           metadata:
             type: object
           spec:
-            description: BucketSpec defines the desired state of Bucket
+            description: TransformJobSpec defines the desired state of TransformJob
             properties:
-              acl:
+              batchStrategy:
                 type: string
-              createBucketConfiguration:
+              dataProcessing:
                 properties:
-                  locationConstraint:
+                  inputFilter:
+                    type: string
+                  joinSource:
+                    type: string
+                  outputFilter:
                     type: string
                 type: object
-              grantFullControl:
+              environment:
+                additionalProperties:
+                  type: string
+                type: object
+              experimentConfig:
+                properties:
+                  experimentName:
+                    type: string
+                  trialComponentDisplayName:
+                    type: string
+                  trialName:
+                    type: string
+                type: object
+              maxConcurrentTransforms:
+                format: int64
+                type: integer
+              maxPayloadInMB:
+                format: int64
+                type: integer
+              modelClientConfig:
+                properties:
+                  invocationsMaxRetries:
+                    format: int64
+                    type: integer
+                  invocationsTimeoutInSeconds:
+                    format: int64
+                    type: integer
+                type: object
+              modelName:
                 type: string
-              grantRead:
+              tags:
+                items:
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
+              transformInput:
+                properties:
+                  compressionType:
+                    type: string
+                  contentType:
+                    type: string
+                  dataSource:
+                    properties:
+                      s3DataSource:
+                        properties:
+                          s3DataType:
+                            type: string
+                          s3URI:
+                            type: string
+                        type: object
+                    type: object
+                  splitType:
+                    type: string
+                type: object
+              transformJobName:
                 type: string
-              grantReadACP:
-                type: string
-              grantWrite:
-                type: string
-              grantWriteACP:
-                type: string
-              name:
-                type: string
-              objectLockEnabledForBucket:
-                type: boolean
+              transformOutput:
+                properties:
+                  accept:
+                    type: string
+                  assembleWith:
+                    type: string
+                  kmsKeyID:
+                    type: string
+                  s3OutputPath:
+                    type: string
+                type: object
+              transformResources:
+                properties:
+                  instanceCount:
+                    format: int64
+                    type: integer
+                  instanceType:
+                    type: string
+                  volumeKMSKeyID:
+                    type: string
+                type: object
             type: object
           status:
-            description: BucketStatus defines the observed state of Bucket
+            description: TransformJobStatus defines the observed state of TransformJob
             properties:
               ackResourceMetadata:
                 description: All CRs managed by ACK have a common `Status.ACKResourceMetadata`
@@ -117,8 +188,6 @@ spec:
                   - type
                   type: object
                 type: array
-              location:
-                type: string
             required:
             - ackResourceMetadata
             - conditions

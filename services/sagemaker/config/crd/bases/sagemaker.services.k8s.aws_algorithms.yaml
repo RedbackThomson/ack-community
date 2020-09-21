@@ -1,0 +1,401 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.0
+  creationTimestamp: null
+  name: algorithms.sagemaker.services.k8s.aws
+spec:
+  group: sagemaker.services.k8s.aws
+  names:
+    kind: Algorithm
+    listKind: AlgorithmList
+    plural: algorithms
+    singular: algorithm
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Algorithm is the Schema for the Algorithms API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: AlgorithmSpec defines the desired state of Algorithm
+            properties:
+              algorithmDescription:
+                type: string
+              algorithmName:
+                type: string
+              certifyForMarketplace:
+                type: boolean
+              inferenceSpecification:
+                properties:
+                  containers:
+                    items:
+                      properties:
+                        containerHostname:
+                          type: string
+                        image:
+                          type: string
+                        imageDigest:
+                          type: string
+                        modelDataURL:
+                          type: string
+                        productID:
+                          type: string
+                      type: object
+                    type: array
+                  supportedContentTypes:
+                    items:
+                      type: string
+                    type: array
+                  supportedRealtimeInferenceInstanceTypes:
+                    items:
+                      type: string
+                    type: array
+                  supportedResponseMIMETypes:
+                    items:
+                      type: string
+                    type: array
+                  supportedTransformInstanceTypes:
+                    items:
+                      type: string
+                    type: array
+                type: object
+              trainingSpecification:
+                properties:
+                  metricDefinitions:
+                    items:
+                      properties:
+                        name:
+                          type: string
+                        regex:
+                          type: string
+                      type: object
+                    type: array
+                  supportedHyperParameters:
+                    items:
+                      properties:
+                        defaultValue:
+                          type: string
+                        description:
+                          type: string
+                        isRequired:
+                          type: boolean
+                        isTunable:
+                          type: boolean
+                        name:
+                          type: string
+                        range:
+                          properties:
+                            categoricalParameterRangeSpecification:
+                              properties:
+                                values:
+                                  items:
+                                    type: string
+                                  type: array
+                              type: object
+                            continuousParameterRangeSpecification:
+                              properties:
+                                maxValue:
+                                  type: string
+                                minValue:
+                                  type: string
+                              type: object
+                            integerParameterRangeSpecification:
+                              properties:
+                                maxValue:
+                                  type: string
+                                minValue:
+                                  type: string
+                              type: object
+                          type: object
+                        type:
+                          type: string
+                      type: object
+                    type: array
+                  supportedTrainingInstanceTypes:
+                    items:
+                      type: string
+                    type: array
+                  supportedTuningJobObjectiveMetrics:
+                    items:
+                      properties:
+                        metricName:
+                          type: string
+                        type:
+                          type: string
+                      type: object
+                    type: array
+                  supportsDistributedTraining:
+                    type: boolean
+                  trainingChannels:
+                    items:
+                      properties:
+                        description:
+                          type: string
+                        isRequired:
+                          type: boolean
+                        name:
+                          type: string
+                        supportedCompressionTypes:
+                          items:
+                            type: string
+                          type: array
+                        supportedContentTypes:
+                          items:
+                            type: string
+                          type: array
+                        supportedInputModes:
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    type: array
+                  trainingImage:
+                    type: string
+                  trainingImageDigest:
+                    type: string
+                type: object
+              validationSpecification:
+                properties:
+                  validationProfiles:
+                    items:
+                      properties:
+                        profileName:
+                          type: string
+                        trainingJobDefinition:
+                          properties:
+                            hyperParameters:
+                              additionalProperties:
+                                type: string
+                              type: object
+                            inputDataConfig:
+                              items:
+                                properties:
+                                  channelName:
+                                    type: string
+                                  compressionType:
+                                    type: string
+                                  contentType:
+                                    type: string
+                                  dataSource:
+                                    properties:
+                                      fileSystemDataSource:
+                                        properties:
+                                          directoryPath:
+                                            type: string
+                                          fileSystemAccessMode:
+                                            type: string
+                                          fileSystemID:
+                                            type: string
+                                          fileSystemType:
+                                            type: string
+                                        type: object
+                                      s3DataSource:
+                                        properties:
+                                          attributeNames:
+                                            items:
+                                              type: string
+                                            type: array
+                                          s3DataDistributionType:
+                                            type: string
+                                          s3DataType:
+                                            type: string
+                                          s3URI:
+                                            type: string
+                                        type: object
+                                    type: object
+                                  inputMode:
+                                    type: string
+                                  recordWrapperType:
+                                    type: string
+                                  shuffleConfig:
+                                    properties:
+                                      seed:
+                                        format: int64
+                                        type: integer
+                                    type: object
+                                type: object
+                              type: array
+                            outputDataConfig:
+                              properties:
+                                kmsKeyID:
+                                  type: string
+                                s3OutputPath:
+                                  type: string
+                              type: object
+                            resourceConfig:
+                              properties:
+                                instanceCount:
+                                  format: int64
+                                  type: integer
+                                instanceType:
+                                  type: string
+                                volumeKMSKeyID:
+                                  type: string
+                                volumeSizeInGB:
+                                  format: int64
+                                  type: integer
+                              type: object
+                            stoppingCondition:
+                              properties:
+                                maxRuntimeInSeconds:
+                                  format: int64
+                                  type: integer
+                                maxWaitTimeInSeconds:
+                                  format: int64
+                                  type: integer
+                              type: object
+                            trainingInputMode:
+                              type: string
+                          type: object
+                        transformJobDefinition:
+                          properties:
+                            batchStrategy:
+                              type: string
+                            environment:
+                              additionalProperties:
+                                type: string
+                              type: object
+                            maxConcurrentTransforms:
+                              format: int64
+                              type: integer
+                            maxPayloadInMB:
+                              format: int64
+                              type: integer
+                            transformInput:
+                              properties:
+                                compressionType:
+                                  type: string
+                                contentType:
+                                  type: string
+                                dataSource:
+                                  properties:
+                                    s3DataSource:
+                                      properties:
+                                        s3DataType:
+                                          type: string
+                                        s3URI:
+                                          type: string
+                                      type: object
+                                  type: object
+                                splitType:
+                                  type: string
+                              type: object
+                            transformOutput:
+                              properties:
+                                accept:
+                                  type: string
+                                assembleWith:
+                                  type: string
+                                kmsKeyID:
+                                  type: string
+                                s3OutputPath:
+                                  type: string
+                              type: object
+                            transformResources:
+                              properties:
+                                instanceCount:
+                                  format: int64
+                                  type: integer
+                                instanceType:
+                                  type: string
+                                volumeKMSKeyID:
+                                  type: string
+                              type: object
+                          type: object
+                      type: object
+                    type: array
+                  validationRole:
+                    type: string
+                type: object
+            type: object
+          status:
+            description: AlgorithmStatus defines the observed state of Algorithm
+            properties:
+              ackResourceMetadata:
+                description: All CRs managed by ACK have a common `Status.ACKResourceMetadata`
+                  member that is used to contain resource sync state, account ownership,
+                  constructed ARN for the resource
+                properties:
+                  arn:
+                    description: 'ARN is the Amazon Resource Name for the resource.
+                      This is a globally-unique identifier and is set only by the
+                      ACK service controller once the controller has orchestrated
+                      the creation of the resource OR when it has verified that an
+                      "adopted" resource (a resource where the ARN annotation was
+                      set by the Kubernetes user on the CR) exists and matches the
+                      supplied CR''s Spec field values. TODO(vijat@): Find a better
+                      strategy for resources that do not have ARN in CreateOutputResponse
+                      https://github.com/aws/aws-controllers-k8s/issues/270'
+                    type: string
+                  ownerAccountID:
+                    description: OwnerAccountID is the AWS Account ID of the account
+                      that owns the backend AWS service API resource.
+                    type: string
+                required:
+                - ownerAccountID
+                type: object
+              conditions:
+                description: All CRS managed by ACK have a common `Status.Conditions`
+                  member that contains a collection of `ackv1alpha1.Condition` objects
+                  that describe the various terminal states of the CR and its backend
+                  AWS service API resource
+                items:
+                  description: Condition is the common struct used by all CRDs managed
+                    by ACK service controllers to indicate terminal states  of the
+                    CR and its backend AWS service API resource
+                  properties:
+                    lastTransitionTime:
+                      description: Last time the condition transitioned from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: A human readable message indicating details about
+                        the transition.
+                      type: string
+                    reason:
+                      description: The reason for the condition's last transition.
+                      type: string
+                    status:
+                      description: Status of the condition, one of True, False, Unknown.
+                      type: string
+                    type:
+                      description: Type is the type of the Condition
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+            required:
+            - ackResourceMetadata
+            - conditions
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

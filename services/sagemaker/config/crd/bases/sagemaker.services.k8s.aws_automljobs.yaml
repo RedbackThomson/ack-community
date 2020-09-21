@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
   creationTimestamp: null
-  name: buckets.s3.services.k8s.aws
+  name: automljobs.sagemaker.services.k8s.aws
 spec:
-  group: s3.services.k8s.aws
+  group: sagemaker.services.k8s.aws
   names:
-    kind: Bucket
-    listKind: BucketList
-    plural: buckets
-    singular: bucket
+    kind: AutoMLJob
+    listKind: AutoMLJobList
+    plural: automljobs
+    singular: automljob
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Bucket is the Schema for the Buckets API
+        description: AutoMLJob is the Schema for the AutoMLJobs API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,32 +34,92 @@ spec:
           metadata:
             type: object
           spec:
-            description: BucketSpec defines the desired state of Bucket
+            description: AutoMLJobSpec defines the desired state of AutoMLJob
             properties:
-              acl:
-                type: string
-              createBucketConfiguration:
+              autoMLJobConfig:
                 properties:
-                  locationConstraint:
+                  completionCriteria:
+                    properties:
+                      maxAutoMLJobRuntimeInSeconds:
+                        format: int64
+                        type: integer
+                      maxCandidates:
+                        format: int64
+                        type: integer
+                      maxRuntimePerTrainingJobInSeconds:
+                        format: int64
+                        type: integer
+                    type: object
+                  securityConfig:
+                    properties:
+                      enableInterContainerTrafficEncryption:
+                        type: boolean
+                      volumeKMSKeyID:
+                        type: string
+                      vpcConfig:
+                        properties:
+                          securityGroupIDs:
+                            items:
+                              type: string
+                            type: array
+                          subnets:
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                    type: object
+                type: object
+              autoMLJobName:
+                type: string
+              autoMLJobObjective:
+                properties:
+                  metricName:
                     type: string
                 type: object
-              grantFullControl:
-                type: string
-              grantRead:
-                type: string
-              grantReadACP:
-                type: string
-              grantWrite:
-                type: string
-              grantWriteACP:
-                type: string
-              name:
-                type: string
-              objectLockEnabledForBucket:
+              generateCandidateDefinitionsOnly:
                 type: boolean
+              inputDataConfig:
+                items:
+                  properties:
+                    compressionType:
+                      type: string
+                    dataSource:
+                      properties:
+                        s3DataSource:
+                          properties:
+                            s3DataType:
+                              type: string
+                            s3URI:
+                              type: string
+                          type: object
+                      type: object
+                    targetAttributeName:
+                      type: string
+                  type: object
+                type: array
+              outputDataConfig:
+                properties:
+                  kmsKeyID:
+                    type: string
+                  s3OutputPath:
+                    type: string
+                type: object
+              problemType:
+                type: string
+              roleARN:
+                type: string
+              tags:
+                items:
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
             type: object
           status:
-            description: BucketStatus defines the observed state of Bucket
+            description: AutoMLJobStatus defines the observed state of AutoMLJob
             properties:
               ackResourceMetadata:
                 description: All CRs managed by ACK have a common `Status.ACKResourceMetadata`
@@ -117,8 +177,6 @@ spec:
                   - type
                   type: object
                 type: array
-              location:
-                type: string
             required:
             - ackResourceMetadata
             - conditions

@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
   creationTimestamp: null
-  name: buckets.s3.services.k8s.aws
+  name: userprofiles.sagemaker.services.k8s.aws
 spec:
-  group: s3.services.k8s.aws
+  group: sagemaker.services.k8s.aws
   names:
-    kind: Bucket
-    listKind: BucketList
-    plural: buckets
-    singular: bucket
+    kind: UserProfile
+    listKind: UserProfileList
+    plural: userprofiles
+    singular: userprofile
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Bucket is the Schema for the Buckets API
+        description: UserProfile is the Schema for the UserProfiles API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,32 +34,76 @@ spec:
           metadata:
             type: object
           spec:
-            description: BucketSpec defines the desired state of Bucket
+            description: UserProfileSpec defines the desired state of UserProfile
             properties:
-              acl:
+              domainID:
                 type: string
-              createBucketConfiguration:
+              singleSignOnUserIdentifier:
+                type: string
+              singleSignOnUserValue:
+                type: string
+              tags:
+                items:
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
+              userProfileName:
+                type: string
+              userSettings:
                 properties:
-                  locationConstraint:
+                  executionRole:
                     type: string
+                  jupyterServerAppSettings:
+                    properties:
+                      defaultResourceSpec:
+                        properties:
+                          instanceType:
+                            type: string
+                          sageMakerImageARN:
+                            type: string
+                        type: object
+                    type: object
+                  kernelGatewayAppSettings:
+                    properties:
+                      defaultResourceSpec:
+                        properties:
+                          instanceType:
+                            type: string
+                          sageMakerImageARN:
+                            type: string
+                        type: object
+                    type: object
+                  securityGroups:
+                    items:
+                      type: string
+                    type: array
+                  sharingSettings:
+                    properties:
+                      notebookOutputOption:
+                        type: string
+                      s3KMSKeyID:
+                        type: string
+                      s3OutputPath:
+                        type: string
+                    type: object
+                  tensorBoardAppSettings:
+                    properties:
+                      defaultResourceSpec:
+                        properties:
+                          instanceType:
+                            type: string
+                          sageMakerImageARN:
+                            type: string
+                        type: object
+                    type: object
                 type: object
-              grantFullControl:
-                type: string
-              grantRead:
-                type: string
-              grantReadACP:
-                type: string
-              grantWrite:
-                type: string
-              grantWriteACP:
-                type: string
-              name:
-                type: string
-              objectLockEnabledForBucket:
-                type: boolean
             type: object
           status:
-            description: BucketStatus defines the observed state of Bucket
+            description: UserProfileStatus defines the observed state of UserProfile
             properties:
               ackResourceMetadata:
                 description: All CRs managed by ACK have a common `Status.ACKResourceMetadata`
@@ -117,8 +161,6 @@ spec:
                   - type
                   type: object
                 type: array
-              location:
-                type: string
             required:
             - ackResourceMetadata
             - conditions
