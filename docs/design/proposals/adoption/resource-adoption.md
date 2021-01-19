@@ -120,7 +120,7 @@ Adoption, for some resources, is not possible due to any number of the following
 * The service cannot provide adequate information to produce a full specification
 * Unforeseen limitations within ACK or the service directly
 
-For any of these cases, the resource can be marked as “not adoptable” and the validation webhook will subsequently reject any adopted resources of this type. Therefore, the manager will never attempt to run the adoption process. This flag can be set in the generator configuration file with the `cannot_adopt` boolean option supplied for any resource.
+For any of these cases, the resource can be marked as "not adoptable" and the validation webhook will subsequently reject any adopted resources of this type. Therefore, the manager will never attempt to run the adoption process. This option can be managed with a flag in the generator configuration file labelled `is_adoptable`.
 
 ## Adoption Process Diagram
 
