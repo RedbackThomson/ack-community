@@ -2,54 +2,52 @@
 
 # The Problem
 
-New ACK users typically already have implemented their infrastructure in existing solutions, meaning they have deployed production AWS resources into their accounts. While ACK provides good tooling for creating new resources, the path to migration from existing declarative infrastructure technologies into ACK is, so far, bumpy. The current method for migration requires users to store the current state of their applications, delete the resources, and re-create them using ACK. This process introduces numerous places for bugs, loss of the state of existing deployments and downtime in production workloads. Furthermore, considering the case where a K8s cluster loses state, users have no path to recover the previous resources without having to recreate all of them using ACK.
+New ACK users typically have existing AWS resources in their accounts. These resources were not originally created by an ACK service controller. While ACK can create new resources, getting ACK service controllers to take over management of an existing resource is not yet supported.
 
-ACK aims to provide the ability to “adopt” existing resources into your Kubernetes environment. Given the user has access to an existing resource, and that ACK operators exist for each resource’s associated service, the ACK controller will be able to determine the current specification and status of the AWS resource and reconcile said resource as if it were created natively in k8s.
+The current method for migrating management of resources over to ACK requires users to store the current state of their applications, delete the resources, and re-create them using ACK. This process introduces places for bugs, loss of the state of existing deployments and downtime in production workloads.
 
-Users have requested this functionality as being pivotal to their adoption of ACK (see [#41](https://github.com/aws/aws-controllers-k8s/issues/41)). Information from user feedback has been considered as part of this document.
+ACK aims to provide the ability to “adopt” existing resources into your Kubernetes environment. Given the user can provide an IAM role which has access to existing resource, and that ACK operators exist for each resource’s associated service, the ACK controller will be able to determine the current specification and status of the AWS resource and reconcile said resource as if it were created natively in k8s.
 
-Below are a number of use cases for requesting the ability this feature.
+## Use Cases
 
 1. Migrating existing architecture from another platform (CFN, CDK, Terraform, etc.)
     1. Resources exist but have never been managed by K8s - no spec files
-2. Restoring from a broken K8s environment (etcd failure, complete state loss)
-    1. Resources exist and have previously been managed by K8s, but are not being actively reconciled
 3. Migrating architecture across K8s environments
-    1. Resource exist and are actively being managed by another K8s environment
+    1. Resource are being managed by another K8s environment
 
 # Proposed Implementation
 
 ## Overview
 
-The proposed solution will provide an alternate workflow by which to adopt resources through a separate set of manifests. A new custom resource definition, the `AdoptedResource` CRD, provides a standardised template by which to indicate to ACK that it should attempt to adopt a given resource. 
-The `AdoptedResource` CRD provides a boilerplate to reference an existing AWS resource (either through ARN, name or other unique identifier) and a target ACK type. Each ACK manager will subscribe to the list of adopted resources and will attempt to adopt any resources that match its managed type.
+The proposed solution will provide an alternate workflow by which to adopt resources through a separate set of manifests. A new custom resource definition, the `AdoptedResource` CRD, provides a signal to ACK to adopt an existing resource. 
+The `AdoptedResource` CRD references an existing AWS resource (either through ARN, name or other unique identifier) and a target Kubernetes `GroupVersionKind`. Each ACK resource manager will subscribe to the list of adopted resources and will attempt to adopt any resources that match its managed type.
 The manager will describe the referenced AWS resource, typically through a `Describe*` SDK call, and use the returned values to compile a new custom resource - with filled spec and status fields. The manager will then apply this custom resource to the cluster using the metadata applied in the `AdoptedResource` spec.
 
 ## `AdoptedResource` Specification
 
-The `AdoptedResource` custom resource definition will allow for specification of an AWS resource unique identifier, a target ACK type (with API group and kind), and target metadata fields.
+The `AdoptedResource` custom resource definition will allow for specification of an AWS resource unique identifier, a target Kubernetes `GroupVersionKind`, and `kubernetes` fields.
 The AWS resource unique identifier allows identification through at most one of:
 
 * `arn` - An [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) (Amazon Resource Name)
 * `name` - A resource name (a string value)
-* `id` - A resource ID (an integer value)
+* `id` - A resource ID (a string value)
 
 The custom resource definition makes no assumptions about which fields should be present for any given target kind. It is therefore up to the manager to validate the identifier input shape for existence and correctness.
 
-The target ACK type is specified through the following required fields:
+The target Kubernetes `GroupVersionKind` is specified through the following required fields:
 
 * [API group and version](https://kubernetes.io/docs/concepts/overview/kubernetes-api/#api-groups-and-versioning)
 * [Resource kind](https://kubernetes.io/docs/reference/kubectl/overview/#resource-types)
 
 A validating webhook for the `AdoptedResource` custom resources will validate the existence of the target type in the cluster and ensure the requested type is able to be adopted. 
 
-The target metadata field is an arbitrary mapping of key-value pairs that will be applied as the metadata for the created custom resource. If a `name` field is specified in this mapping, the manager should use this value as the custom resource `name` . Otherwise, the manager will use the name specified in the metadata of the `AdoptedResource` as the default name for the resource. This same method will also apply to the `namespace` field. All other fields in the metadata mapping are applied to the created resource without validation.
+The `kubernetes` field is an [`ObjectMeta`](https://github.com/kubernetes/apimachinery/blob/4f505736214f6a32e70f37c6bae217360fe227b2/pkg/apis/meta/v1/types.go#L110) type that will be applied as the metadata for the created custom resource. If the `name` and/o `namespace` fields within the `kubernetes` spec is not defined, the respective fields from the `AdoptedResource` will be used as the value for the custom resource.
 
 ### Example Specifications
 
 **1. An adopted S3 bucket with the minimal number of fields**
 
-```
+```yaml
 apiVersion: s3.services.k8s.aws/v1alpha1
 kind: AdoptedResource
 metadata:
@@ -63,7 +61,7 @@ spec:
 
 **2. An adopted S3 bucket with overriding metadata fields**
 
-```
+```yaml
 apiVersion: s3.services.k8s.aws/v1alpha1
 kind: AdoptedResource
 metadata:
@@ -82,7 +80,7 @@ spec:
 
 **3. An adopted API Gateway v2 API (using an ID identifier)**
 
-```
+```yaml
 apiVersion: apigateway.services.k8s.aws/v1alpha1
 kind: AdoptedResource
 metadata:
@@ -96,9 +94,9 @@ spec:
 
 ### Custom Resource Validation Webhook
 
-In order to minimise the chance of user’s facing unexpected behaviours, a validating webhook will validate any adopted resource changes prior to submission to the ACK managers. The webhook will primarily reject the following error cases:
+In order to minimise the chance of user’s facing unexpected behaviours, a validating webhook will validate any adopted resource changes prior to submission to the ACK resource managers. The webhook will primarily reject the following error cases:
 
-1. The provided target ACK type does not exist within the cluster
+1. The provided target `GroupVersionKind` does not exist within the cluster
 2. The target resource would override an existing resource
 3. The target resource type cannot be adopted
 
@@ -112,7 +110,7 @@ The adopted annotation would remain on the custom resource for the remainder of 
 
 ## AWS Resource Tagging
 
-AWS resources adopted by an ACK controller will have tags retroactively applied (whenever possible) to indicate its association with an ACK deployment. The details of these tags are discussed in another issue ([#148](https://github.com/aws/aws-controllers-k8s/issues/148)). ACK managers should not place any conditions on the existence of ACK tags on the AWS resources to gate the adoption process. The manager should should override any existing ACK tags.
+AWS resources adopted by an ACK controller will have tags retroactively applied (whenever possible) to indicate its association with an ACK deployment. The details of these tags are discussed in another issue ([#148](https://github.com/aws/aws-controllers-k8s/issues/148)). ACK resource managers should not place any conditions on the existence of ACK tags on the AWS resources to gate the adoption process. The manager should should override any existing ACK tags.
 
 ## Resource Type Blocklisting
 
@@ -127,32 +125,6 @@ For any of these cases, the resource can be marked as “not adoptable” and th
 ## Adoption Process Diagram
 
 ![sequence-diagram](./images/adoption-sequence-diagram.png)
-# Potential Alternatives
-
-## Resource Adoption Annotation
-
-The existing custom resource definitions (every service resource) would accept an additional annotation that the manager interprets as an indication that the resource specification should be ignored and instead that it should be formed through adoption. For any resource marked with this annotation, upon creation, the manager would attempt to describe the AWS resource associated with the annotated value. If none such resource exists, the manager would update the state of the custom resource into a `AdoptionFailed` terminal state. If the resource does exist, the manager would continue the follow the same adoption process as defined in the [Proposed Implementation](#proposed-implementation) section.
-
-### Example Specification
-
-**An example adopted S3 resource**
-
-```
-apiVersion: s3.services.k8s.aws/v1alpha1
-kind: Bucket
-metadata:
-  annotations:
-    services.k8s.aws/arn: arn:aws:s3:::my-existing-bucket
-  ...
-spec:
-   ...
-```
-
-### Notable Pitfalls
-
-In the event that the user is attempting to restore resources created in a previous installation of ACK (in the event of an etcd corruption, for example), each manifest will need to be updated with the adoption annotation. Therefore the restoration process would require modifying desired state files (k8s manifests) with actual state fields (the created ARN/ID fields). At the least this introduces a temporary change in k8s manifests - add ARNs to manifests,  apply and adopt, delete ARNs from manifests. More so, it could introduce private field information (generated public API IDs, RDS instance ARNs, etc.) into the manifests repository.
-
-Another pitfall is that, given this solution aims to re-use the existing custom resource definitions, all adopted resources would need to provide a specification body that contains all required fields. Every service contains a distinct set of required values, and as such the user would need to modify every adopted resource type with a distinct set of valid dummy values. Assuming a user provides dummy values for these fields, they would subsequently be overwritten by the manager logic when updating the resource.
 
 # In Scope
 
@@ -160,7 +132,6 @@ Another pitfall is that, given this solution aims to re-use the existing custom 
 * Updates to generator for service-specific configuration
 * Code paths for service managers to receive informer updates
 * Unit and E2E tests with a specific ACK controller (e.g. S3 buckets)
-* Verbose logging for adoption lifecycle updates
 
 # Out of Scope
 
@@ -223,3 +194,4 @@ The following workflow may apply to this transition:
     1. *Note: If their state is already as desired, this should not make any updates to the AWS resources*
 7. Delete the custom resources from the old installation
 
+See more discussion in [#41](https://github.com/aws/aws-controllers-k8s/issues/41)
