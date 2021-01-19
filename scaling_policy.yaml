@@ -1,0 +1,25 @@
+apiVersion: applicationautoscaling.services.k8s.aws/v1alpha1
+kind: ScalableTarget
+metadata:
+  name: test-scaling-target
+spec:
+  maxCapacity: 8
+  minCapacity: 1
+  resourceID: "endpoint/my-test-endpoint/variant/default-variant-name"
+  scalableDimension: "sagemaker:variant:DesiredInstanceCount"
+  serviceNamespace: sagemaker
+---
+apiVersion: applicationautoscaling.services.k8s.aws/v1alpha1
+kind: ScalingPolicy
+metadata:
+  name: test-scaling-policy
+spec:
+  policyName: my-test-policy
+  policyType: TargetTrackingScaling
+  resourceID: "endpoint/my-test-endpoint/variant/default-variant-name"
+  scalableDimension: "sagemaker:variant:DesiredInstanceCount"
+  serviceNamespace: sagemaker
+  targetTrackingScalingPolicyConfiguration:
+    targetValue: 70.0
+    predefinedMetricSpecification:
+      predefinedMetricType: SageMakerVariantInvocationsPerInstance
