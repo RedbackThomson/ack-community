@@ -20,13 +20,14 @@ ACK aims to provide the ability to “adopt” existing resources into your Kube
 ## Overview
 
 The proposed solution will provide an alternate workflow by which to adopt resources through a separate set of manifests. A new custom resource definition, the `AdoptedResource` CRD, provides a signal to ACK to adopt an existing resource. 
-The `AdoptedResource` CRD references an existing AWS resource (either through ARN, name or other unique identifier) and a target Kubernetes `GroupVersionKind`. Each ACK resource manager will subscribe to the list of adopted resources and will attempt to adopt any resources that match its managed type.
+The `AdoptedResource` CRD references an existing AWS resource (either through ARN, name or other unique identifier) and a target Kubernetes `GroupVersionKind`. Each ACK controller will reconcile all adopted resources that match any of the types it controls (for the service it manages).
 The manager will describe the referenced AWS resource, typically through a `Describe*` SDK call, and use the returned values to compile a new custom resource - with filled spec and status fields. The manager will then apply this custom resource to the cluster using the metadata applied in the `AdoptedResource` spec.
 
 ## `AdoptedResource` Specification
 
-The `AdoptedResource` custom resource definition will allow for specification of an AWS resource unique identifier, a target Kubernetes `GroupVersionKind`, and `kubernetes` fields.
-The AWS resource unique identifier allows identification through at most one of:
+The `AdoptedResource` custom resource definition will allow for specification of an AWS resource unique identifier (in the `aws` field) and a target `kubernetes` field - containing Kubernetes `GroupVersionKind` and `metadata` sub-fields.
+
+The `aws` resource unique identifier field allows identification through at most one of:
 
 * `arn` - An [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) (Amazon Resource Name)
 * `name` - A resource name (a string value)
@@ -34,14 +35,14 @@ The AWS resource unique identifier allows identification through at most one of:
 
 The custom resource definition makes no assumptions about which fields should be present for any given target kind. It is therefore up to the manager to validate the identifier input shape for existence and correctness.
 
-The target Kubernetes `GroupVersionKind` is specified through the following required fields:
+The `kubernetes` field wraps the structures from `GroupVersionKind`, which specify the target ACK type through the following required fields:
 
 * [API group and version](https://kubernetes.io/docs/concepts/overview/kubernetes-api/#api-groups-and-versioning)
 * [Resource kind](https://kubernetes.io/docs/reference/kubectl/overview/#resource-types)
 
 A validating webhook for the `AdoptedResource` custom resources will validate the existence of the target type in the cluster and ensure the requested type is able to be adopted. 
 
-The `kubernetes` field is an [`ObjectMeta`](https://github.com/kubernetes/apimachinery/blob/4f505736214f6a32e70f37c6bae217360fe227b2/pkg/apis/meta/v1/types.go#L110) type that will be applied as the metadata for the created custom resource. If the `name` and/o `namespace` fields within the `kubernetes` spec is not defined, the respective fields from the `AdoptedResource` will be used as the value for the custom resource.
+The `kubernetes.metadata` field is an optional [`ObjectMeta`](https://github.com/kubernetes/apimachinery/blob/4f505736214f6a32e70f37c6bae217360fe227b2/pkg/apis/meta/v1/types.go#L110) type that will be applied as the metadata for the created custom resource. If the `name` and/o `namespace` fields within the `metadata` spec is not defined, the respective fields from the `AdoptedResource` will be used as the value for the custom resource.
 
 ### Example Specifications
 
@@ -51,11 +52,12 @@ The `kubernetes` field is an [`ObjectMeta`](https://github.com/kubernetes/apimac
 apiVersion: s3.services.k8s.aws/v1alpha1
 kind: AdoptedResource
 metadata:
-  name: adopted-data-bucket
+    name: adopted-data-bucket
 spec:
-   apiVersion: s3.services.k8s.aws/v1alpha1
-   kind: Bucket
-   identifier:
+    kubernetes:
+        apiVersion: s3.services.k8s.aws/v1alpha1
+        kind: Bucket
+    aws:
         arn: arn:aws:s3:::my-data-bucket
 ```
 
@@ -65,16 +67,17 @@ spec:
 apiVersion: s3.services.k8s.aws/v1alpha1
 kind: AdoptedResource
 metadata:
-  name: adopted-data-bucket
+    name: adopted-data-bucket
 spec:
-   apiVersion: s3.services.k8s.aws/v1alpha1
-   kind: Bucket
-   metadata:
-        name: data-bucket
-        namespace: team-a
-        annotations:
-            ...
-   identifier:
+    kubernetes:
+        apiVersion: s3.services.k8s.aws/v1alpha1
+        kind: Bucket
+        metadata:
+            name: data-bucket
+            namespace: team-a
+            annotations:
+                ...
+    aws:
         arn: arn:aws:s3:::my-data-bucket
 ```
 
@@ -84,17 +87,18 @@ spec:
 apiVersion: apigateway.services.k8s.aws/v1alpha1
 kind: AdoptedResource
 metadata:
-  name: adopted-api-gateway
+    name: adopted-api-gateway
 spec:
-   apiVersion: apigateway.services.k8s.aws/v1alpha1
-   kind: Api
-   identifier:
+    kubernetes:
+        apiVersion: apigateway.services.k8s.aws/v1alpha1
+        kind: Api
+    aws:
         id: 123456789012
 ```
 
 ### Custom Resource Validation Webhook
 
-In order to minimise the chance of user’s facing unexpected behaviours, a validating webhook will validate any adopted resource changes prior to submission to the ACK resource managers. The webhook will primarily reject the following error cases:
+In order to minimise the chance of user’s facing unexpected behaviours, a validating webhook will validate any adopted resource changes prior to submission to the ACK resource managers. The webhook will primarily **reject** the following error cases:
 
 1. The provided target `GroupVersionKind` does not exist within the cluster
 2. The target resource would override an existing resource
@@ -130,7 +134,8 @@ For any of these cases, the resource can be marked as "not adoptable" and the va
 
 * Declaration of the new `AdoptedResource` CRD
 * Updates to generator for service-specific configuration
-* Code paths for service managers to receive informer updates
+* New reconciler for `AdoptedResource` CRs within each service
+* Validation webhook for `AdoptedResource` types
 * Unit and E2E tests with a specific ACK controller (e.g. S3 buckets)
 
 # Out of Scope
@@ -144,7 +149,7 @@ For any of these cases, the resource can be marked as "not adoptable" and the va
 ## Unit Tests
 
 * Assert validation webhook detects and rejects all blocked conditions
-* Assert manager receives shared informer events
+* Assert adopted resource reconciler filters and manages associated CRs
 * Assert manager can create target CR type from description
 * Assert manager makes call to update AWS resource tags
 
