@@ -30,8 +30,7 @@ The `AdoptedResource` custom resource definition will allow for specification of
 The `aws` resource unique identifier field allows identification through at most one of:
 
 * `arn` - An [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) (Amazon Resource Name)
-* `name` - A resource name (a string value)
-* `id` - A resource ID (a string value)
+* `nameOrID` - A resource name or identifier (a string value)
 
 The custom resource definition makes no assumptions about which fields should be present for any given target kind. It is therefore up to the manager to validate the identifier input shape for existence and correctness.
 
@@ -58,7 +57,7 @@ spec:
         apiVersion: s3.services.k8s.aws/v1alpha1
         kind: Bucket
     aws:
-        arn: arn:aws:s3:::my-data-bucket
+        nameOrID: my-data-bucket
 ```
 
 **2. An adopted S3 bucket with overriding metadata fields**
@@ -78,10 +77,10 @@ spec:
             annotations:
                 ...
     aws:
-        arn: arn:aws:s3:::my-data-bucket
+        nameOrID: my-data-bucket
 ```
 
-**3. An adopted API Gateway v2 API (using an ID identifier)**
+**3. An adopted API Gateway v2 API (using an ARN)**
 
 ```yaml
 apiVersion: apigateway.services.k8s.aws/v1alpha1
@@ -93,7 +92,7 @@ spec:
         apiVersion: apigateway.services.k8s.aws/v1alpha1
         kind: Api
     aws:
-        id: 123456789012
+        arn: arn:aws:apigateway:us-east-1::/apis/123456789012
 ```
 
 ### Custom Resource Validation Webhook
