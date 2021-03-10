@@ -29,6 +29,8 @@ ACK_GENERATE_CONFIG_PATH=${ACK_GENERATE_CONFIG_PATH:-""}
 AWS_SDK_GO_VERSION=${AWS_SDK_GO_VERSION:-""}
 DEFAULT_TEMPLATES_DIR="$ROOT_DIR/../../aws-controllers-k8s/code-generator/templates"
 TEMPLATES_DIR=${TEMPLATES_DIR:-$DEFAULT_TEMPLATES_DIR}
+DEFAULT_RUNTIME_CRD_DIR="$ROOT_DIR/../../aws-controllers-k8s/runtime/config"
+RUNTIME_CRD_DIR=${RUNTIME_CRD_DIR:-$DEFAULT_RUNTIME_CRD_DIR}
 
 USAGE="
 Usage:
@@ -103,6 +105,12 @@ fi
 
 K8S_RBAC_ROLE_NAME=${K8S_RBAC_ROLE_NAME:-"ack-$SERVICE-controller"}
 
+config_output_dir="$SERVICE_CONTROLLER_SOURCE_PATH/config/"
+
+echo "Copying common custom resource definitions into $SERVICE"
+mkdir -p $config_output_dir/crd/common
+cp -r $RUNTIME_CRD_DIR/crd/* $config_output_dir/crd/common/
+
 # If there's a generator.yaml in the service's directory and the caller hasn't
 # specified an override, use that.
 if [ -z "$ACK_GENERATE_CONFIG_PATH" ]; then
@@ -111,7 +119,7 @@ if [ -z "$ACK_GENERATE_CONFIG_PATH" ]; then
     fi
 fi
 
-ag_args="$SERVICE -o $SERVICE_CONTROLLER_SOURCE_PATH --templates-dir $TEMPLATES_DIR"
+ag_args="$SERVICE -o $SERVICE_CONTROLLER_SOURCE_PATH --template-dirs $TEMPLATES_DIR"
 if [ -n "$ACK_GENERATE_CACHE_DIR" ]; then
     ag_args="$ag_args --cache-dir $ACK_GENERATE_CACHE_DIR"
 fi
@@ -135,8 +143,6 @@ $ACK_GENERATE_BIN_PATH $apis_args
 if [ $? -ne 0 ]; then
     exit 2
 fi
-
-config_output_dir="$SERVICE_CONTROLLER_SOURCE_PATH/config/"
 
 pushd $SERVICE_CONTROLLER_SOURCE_PATH/apis/$ACK_GENERATE_API_VERSION 1>/dev/null
 
